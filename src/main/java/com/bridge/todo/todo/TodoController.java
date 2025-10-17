@@ -10,7 +10,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/todo")
 public class TodoController {
-
     private final TodoService todoService;
 
     public TodoController(TodoService todoService) {
@@ -19,6 +18,7 @@ public class TodoController {
 
     @GetMapping
     public ResponseEntity<List<Todo>> getAll() {
-        return ResponseEntity.ok(todoService.getAllTodos());
+        List<Todo> todos = todoService.getAllTodos();
+        return ResponseEntity.ok(todos);
     }
 }

@@ -1,9 +1,14 @@
 package com.bridge.todo.todo;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "todo")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Todo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
