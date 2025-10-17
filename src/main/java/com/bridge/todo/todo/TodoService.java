@@ -6,9 +6,14 @@ import java.util.List;
 
 @Service
 public class TodoService {
-    public TodoService() {};
+
+    private final TodoRepository todoRepository;
+
+    public TodoService(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
+    };
 
     public List<Todo> getAllTodos() {
-        return List.of();
+        return todoRepository.findAll();
     }
 }
