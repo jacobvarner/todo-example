@@ -1,32 +1,52 @@
-import {useEffect, useState} from 'react';
-import type {Todo} from "./Todo.ts";
 import {TodoItem} from "./TodoItem.tsx";
+import type {Todo} from "./Todo.ts";
+import {useState} from "react";
+import {TodoDialog} from "./TodoDialog.tsx";
 
-export const TodoPage =() => {
-    const [todos, setTodos] = useState<Todo[]>([]);
+export const TodoPage = () => {
+    const listOfTodos: Todo[] = [
+        {id: 1, name: "Test 1", description: "This is a test todo", status: "incomplete", points: 5},
+        {id: 2, name: "Test 2", description: "This is another test todo", status: "incomplete", points: 0},
+        {id: 3, name: "Teach Mod-A Friday Class", description: "Continue to go over React testing and building out the start of a todo list application", status: "incomplete", points: 99, assignee: "Jacob & Jeff"}
+    ]
 
-    // This runs when the component loads
-    useEffect(() => {
-        // Replace this with your task fetching logic
-        const tasks: Todo[] = [
-            { id: 1, name: "Step 1", description: "Set up project structure", status: "active" },
-            { id: 2, name: "Step 2", description: "Add component tests", status: "active" },
-            { id: 3, name: "Step 3", description: "Add component", status: "active" }
-        ];
-        setTodos(tasks);
-    }, []);
+    const [todos, setTodos] = useState<Todo[]>(listOfTodos);
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
+    const addTodo = (todo: Todo) => {
+        setTodos([...todos, todo]);
+    }
+
+    const handleOpen = () => {
+        setIsDialogOpen(true);
+    }
+
+    const handleClose = () => {
+        setIsDialogOpen(false);
+    }
+
+    const handleToggle = (id: number) => {
+        setTodos(todos.map(todo => {
+            if (todo.id === id) {
+                if (todo.status === "incomplete") {
+                    return { ...todo, status: "complete" };
+                } else {
+                    return { ...todo, status: "incomplete" };
+                }
+            } else {
+                return todo;
+            }
+        }))
+    }
 
     return (
         <>
-            <h2>My Todo Page</h2>
+            <h2 className={"text-4xl text-black mb-4"}>My Todo Page</h2>
+            <button onClick={handleOpen} className={"border-black bg-gray-400 p-2 text-black w-[200px] h-[40px]"}>Add Todo</button>
             <ul>
-                {todos.map(todo => (
-                    <TodoItem key={todo.id} todoTask={todo} />
-                    ))}
+                {todos.map(todo => <TodoItem todo={todo} handleToggle={handleToggle}/>)}
             </ul>
+            {isDialogOpen && <TodoDialog handleClose={handleClose} addTodo={addTodo}/>}
         </>
     );
 };
-
-export default TodoPage;

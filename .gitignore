@@ -11,6 +11,7 @@ node_modules/
 src/main/resources/static
 .gradle/
 !gradle/wrapper/gradle-wrapper.jar
+local_data
 
 ### STS ###
 .apt_generated

@@ -1,51 +1,71 @@
-import {fireEvent, render, screen} from "@testing-library/react";
-import {describe, expect, it} from "vitest";
+import {describe, expect, it, vi} from "vitest";
+import {render, screen} from "@testing-library/react";
 import {TodoItem} from "../TodoItem.tsx";
 import type {Todo} from "../Todo.ts";
-import { vi } from 'vitest';
 import {userEvent} from "@testing-library/user-event";
 
-let feedDog: Todo;
-let waterPlants: Todo;
+const testTodo: Todo = {
+    id: 1,
+    name: "Test Todo",
+    description: "This is a placeholder todo for testing.",
+    status: "incomplete",
+    points: 5
+}
 
 describe('Todo Item', () => {
-    beforeEach(() => {
-        feedDog = {id: 1, name: "Feed dog", description: "Feed the dog at 5", status: "completed" };
-        waterPlants = {id: 2, name: "Water plants", description: "Water the plants", status: "active" };
+    it('should display a title for the todo', () => {
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()}/>);
+        expect(screen.getByRole("heading", {name: testTodo.name})).toBeVisible();
     });
 
-    it('should display a single item', async () => {
-        render(<TodoItem todoTask={feedDog} />)
-        const listItem = screen.getByRole("listitem");
-        const itemName = listItem.children.namedItem(feedDog.name);
-        expect(itemName.textContent).toBe("Feed dog");
+    it('should display a description for the todo', () => {
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()}/>);
+        expect(screen.getByRole('paragraph', {name: "description"})).toHaveTextContent(testTodo.description);
     })
 
-    it('should be another way to test single item', () => {
-        render(<TodoItem todoTask={feedDog} />)
-        const listItem = screen.getByRole("listitem");
-        expect(listItem.textContent).toContain(feedDog.name);
+    it('should display the point value if it is greater than 0', () => {
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()}/>);
+        expect(screen.getByRole('paragraph', {name: "points value"})).toHaveTextContent(testTodo.points + " Points");
     })
 
-    it('should not have the status checked', () => {
-        render(<TodoItem todoTask={waterPlants} />)
-        expect(screen.getByRole('checkbox', { name: /status/i})).toBeInTheDocument();
-        const handleChange = vi.fn();
-        const statusCheckbox = screen.getByRole('checkbox', {name: /status/i});
-
-        expect(statusCheckbox).not.toBeChecked();
-        expect(handleChange).toHaveBeenCalledTimes(0);
-    });
-
-    it('should change the status of the task on click', async () => {
-        render(<TodoItem todoTask={waterPlants} />)
-        const handleChange = vi.fn();
-        const statusCheckbox = screen.getByRole('checkbox', {name: /status/i});
-        expect(statusCheckbox).toBeInTheDocument();
-        //fireEvent.click(statusCheckbox);
-        await userEvent.click(statusCheckbox);
-        expect(statusCheckbox).toBeChecked();
-        expect(handleChange).toHaveBeenCalledTimes(1);
+    it('should not display the point value if it is worth 0 points', () => {
+        render(<TodoItem todo={{...testTodo, points: 0}} handleToggle={vi.fn()}/>);
+        expect(screen.queryByRole("paragraph", { name: "points value"})).toBeNull();
     })
 
-})
+    it('should display the assignee if there is one', () => {
+        render(<TodoItem todo={{...testTodo, assignee: "Person 1"}} handleToggle={vi.fn()}/>);
+        expect(screen.getByRole('paragraph', {name: "assignee"})).toHaveTextContent("Person 1");
+    })
+
+    it('should not display the assignee if there is not someone assigned', () => {
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()}/>);
+        expect(screen.queryByRole("paragraph", { name: "assignee"})).toBeNull();
+    })
+
+    it('should display a button to complete the todo if it is incomplete', () => {
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()}/>);
+        expect(screen.getByRole("button", {name: "Mark Complete"})).toBeVisible();
+    })
+
+    it('should display a button to un-complete the todo if it has accidentally been completed', () => {
+        render(<TodoItem todo={{...testTodo, status: "complete"}} handleToggle={vi.fn()}/>);
+        expect(screen.getByRole("button", {name: "Mark Incomplete"})).toBeVisible();
+    })
+
+    it('should call a handleToggle function when complete button is clicked', async () => {
+        const mockHandleToggle = vi.fn();
+        const user = userEvent.setup();
+        render(<TodoItem todo={testTodo} handleToggle={mockHandleToggle}/>);
+        await user.click(screen.getByRole("button", { name: "Mark Complete"}));
+        expect(mockHandleToggle).toHaveBeenCalledWith(testTodo.id);
+    })
+
+    it('should call a handleToggle function when incomplete button is clicked', async () => {
+        const mockHandleToggle = vi.fn();
+        const user = userEvent.setup();
+        render(<TodoItem todo={{...testTodo, status: "complete"}} handleToggle={mockHandleToggle}/>);
+        await user.click(screen.getByRole("button", { name: "Mark Incomplete"}));
+        expect(mockHandleToggle).toHaveBeenCalledWith(testTodo.id);
+    })
+});
