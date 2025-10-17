@@ -2,6 +2,7 @@ import {TodoItem} from "./TodoItem.tsx";
 import type {Todo} from "./Todo.ts";
 import {useState} from "react";
 import {TodoDialog} from "./TodoDialog.tsx";
+import axios from "axios";
 
 export const TodoPage = () => {
     const listOfTodos: Todo[] = [
@@ -12,6 +13,11 @@ export const TodoPage = () => {
 
     const [todos, setTodos] = useState<Todo[]>(listOfTodos);
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+
+    const testBackend = async () => {
+        const response = await axios.get("/api/todo");
+        console.log(response.data)
+    }
 
     const addTodo = (todo: Todo) => {
         setTodos([...todos, todo]);
@@ -42,6 +48,7 @@ export const TodoPage = () => {
     return (
         <>
             <h2 className={"text-4xl text-black mb-4"}>My Todo Page</h2>
+            <button onClick={testBackend}>Test</button>
             <button onClick={handleOpen} className={"border-black bg-gray-400 p-2 text-black w-[200px] h-[40px]"}>Add Todo</button>
             <ul>
                 {todos.map(todo => <TodoItem todo={todo} handleToggle={handleToggle}/>)}
