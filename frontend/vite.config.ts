@@ -1,5 +1,5 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite';
+import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -8,7 +8,7 @@ export default defineConfig({
     server: {
         port: 3000,
         strictPort: true,
-        hmr:{
+        hmr: {
             clientPort: 3000,
         },
         proxy: {
@@ -18,9 +18,9 @@ export default defineConfig({
             },
         },
     },
-  plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss()],
     build: {
-      outDir: 'build',
+        outDir: 'build',
     },
     test: {
         globals: true, // Allows using `describe`, `it`, `expect` without imports

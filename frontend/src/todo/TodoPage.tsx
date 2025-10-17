@@ -15,8 +15,8 @@ export const TodoPage = () => {
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
     const testBackend = async () => {
-        const response = await axios.get("/api/todo");
-        console.log(response.data)
+        const response = await axios.get("/api/test");
+        console.log(response.data);
     }
 
     const addTodo = (todo: Todo) => {
