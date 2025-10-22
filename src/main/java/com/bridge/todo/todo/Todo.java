@@ -9,6 +9,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class Todo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +21,10 @@ public class Todo {
 
     public Todo(Integer id, String name) {
         this.id = id;
+        this.name = name;
+    }
+
+    public Todo(String name) {
         this.name = name;
     }
 }

@@ -1,9 +1,8 @@
 package com.bridge.todo.todo;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,5 +19,11 @@ public class TodoController {
     public ResponseEntity<List<Todo>> getAll() {
         List<Todo> todos = todoService.getAllTodos();
         return ResponseEntity.ok(todos);
+    }
+
+    @PostMapping
+    public ResponseEntity<Todo> addTodo(@RequestBody Todo newTodo) {
+        Todo createdTodo = todoService.addTodo(newTodo);
+        return new ResponseEntity<>(createdTodo, HttpStatus.CREATED);
     }
 }
