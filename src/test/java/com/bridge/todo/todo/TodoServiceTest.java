@@ -37,7 +37,25 @@ class TodoServiceTest {
 
         List<Todo> result = todoService.getAllTodos();
 
-        assertEquals(result, testListOfTodos);
+        assertEquals(testListOfTodos, result);
+    }
+
+    @Test
+    void addTodo_shouldCallRepository() {
+        Todo testTodo = new Todo("test 1");
+        todoService.addTodo(testTodo);
+
+        verify(mockTodoRepository, times(1)).save(testTodo);
+    }
+
+    @Test
+    void addTodo_shouldReturnTheCreatedTodo() {
+        Todo newTestTodo = new Todo("test 1");
+        Todo createdTestTodo = new Todo(1, "test 1");
+        when(mockTodoRepository.save(newTestTodo)).thenReturn(createdTestTodo);
+
+        Todo result = todoService.addTodo(newTestTodo);
+        assertEquals(createdTestTodo, result);
     }
 
 }

@@ -18,6 +18,6 @@ public class TodoService {
     }
 
     public Todo addTodo(Todo todoToAdd) {
-        return null;
+        return todoRepository.save(todoToAdd);
     }
 }
