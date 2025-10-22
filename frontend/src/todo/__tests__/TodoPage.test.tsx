@@ -2,8 +2,11 @@ import {render, screen, within} from "@testing-library/react";
 import {describe, expect, it} from "vitest";
 import { TodoPage } from "../TodoPage.tsx";
 import {userEvent} from "@testing-library/user-event";
+import * as TodoClient from "../TodoClient.ts"
 
 describe('Todo Page', () => {
+    vi.spyOn(TodoClient, 'getTodos').mockResolvedValue([]);
+
     it('should display the title', async () => {
         render(<TodoPage/>)
         expect(screen.getByRole("heading", {name: /my todo page/i})).toBeVisible()
@@ -34,17 +37,19 @@ describe('Todo Page', () => {
         expect(screen.queryByRole("dialog", { name: "Add Todo Dialog"})).toBeNull();
     })
 
-    it('should display all todos', () => {
+    it('should display all todos', async () => {
+        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1"}, {id: 2, name: "test 2"}]);
         render(<TodoPage/>);
-        expect(screen.getAllByRole("listitem")).toHaveLength(3);
+        expect(await screen.findAllByRole("listitem")).toHaveLength(2);
     })
 
     it('should toggle a todo when clicked', async () => {
+        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
         render(<TodoPage/>);
         const user = userEvent.setup();
-        const todo = screen.getByRole("listitem", {name: "Test 1"});
+        const todo = await screen.findByRole("listitem", {name: "test 1"});
         const markCompleteButton = within(todo).getByRole("button", {name: "Mark Complete"});
         await user.click(markCompleteButton);
-        expect(within(todo).getByRole("button", { name: "Mark Incomplete"})).toBeVisible();
+        expect(await within(todo).findByRole("button", { name: "Mark Incomplete"})).toBeVisible();
     })
 })
