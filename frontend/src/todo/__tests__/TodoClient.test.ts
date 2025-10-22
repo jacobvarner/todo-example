@@ -1,6 +1,7 @@
 import axios from "axios";
-import {getTodos} from "../TodoClient.ts";
+import {addTodo, getTodos} from "../TodoClient.ts";
 import {expect} from "vitest";
+import type {Todo} from "../Todo.ts";
 
 describe('Todo Client', () => {
    it('should call axios GET to get all todos', async () => {
@@ -15,4 +16,30 @@ describe('Todo Client', () => {
        const result = await getTodos();
        expect(testTodos).toEqual(result);
    })
+
+    it('should call axios POST to add a todo', async () => {
+        const axiosSpy = vi.spyOn(axios, 'post');
+        const testTodoToAdd: Todo = {
+            name: "Test todo",
+            description: "Test description",
+            assignee: "Test person",
+            points: 5,
+            status: "incomplete"
+        }
+        await addTodo(testTodoToAdd);
+        expect(axiosSpy).toHaveBeenCalledWith('/api/todo', testTodoToAdd);
+    });
+
+    it('should return created todo', async () => {
+        const testTodoToAdd: Todo = {
+            name: "Test todo",
+            description: "Test description",
+            assignee: "Test person",
+            points: 5,
+            status: "incomplete"
+        }
+        vi.spyOn(axios, 'post').mockResolvedValueOnce({ data: { ...testTodoToAdd, id: 1} });
+        const result = await addTodo(testTodoToAdd);
+        expect(result).toEqual({...testTodoToAdd, id: 1})
+    });
 });

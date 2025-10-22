@@ -3,6 +3,7 @@ import {describe, expect, it} from "vitest";
 import { TodoPage } from "../TodoPage.tsx";
 import {userEvent} from "@testing-library/user-event";
 import * as TodoClient from "../TodoClient.ts"
+import {act} from "react";
 
 describe('Todo Page', () => {
     vi.spyOn(TodoClient, 'getTodos').mockResolvedValue([]);
@@ -38,7 +39,7 @@ describe('Todo Page', () => {
     })
 
     it('should display all todos', async () => {
-        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1"}, {id: 2, name: "test 2"}]);
+        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}, {id: 2, name: "test 2", status: "incomplete"}]);
         render(<TodoPage/>);
         expect(await screen.findAllByRole("listitem")).toHaveLength(2);
     })
@@ -49,7 +50,9 @@ describe('Todo Page', () => {
         const user = userEvent.setup();
         const todo = await screen.findByRole("listitem", {name: "test 1"});
         const markCompleteButton = within(todo).getByRole("button", {name: "Mark Complete"});
-        await user.click(markCompleteButton);
+        await act(async () => {
+            await user.click(markCompleteButton);
+        })
         expect(await within(todo).findByRole("button", { name: "Mark Incomplete"})).toBeVisible();
     })
 })

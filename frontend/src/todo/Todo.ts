@@ -1,8 +1,8 @@
 export type Todo = {
-    id: number,
+    id?: number,
     name: string,
-    description: string,
+    description?: string,
     status: "complete" | "incomplete",
-    points: number,
+    points?: number,
     assignee?: string
 }

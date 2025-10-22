@@ -13,7 +13,6 @@ export const TodoDialog = ({handleClose, addTodo}: TodoDialogProps) => {
 
     const handleSubmit = () => {
         addTodo({
-            id: 99,
             name: name ?? "No Name",
             description: description ?? "No Description",
             status: "incomplete",

@@ -2,7 +2,7 @@ import {TodoItem} from "./TodoItem.tsx";
 import type {Todo} from "./Todo.ts";
 import {useEffect, useState} from "react";
 import {TodoDialog} from "./TodoDialog.tsx";
-import {getTodos} from "./TodoClient.ts";
+import {addTodo, getTodos} from "./TodoClient.ts";
 
 export const TodoPage = () => {
     const [todos, setTodos] = useState<Todo[]>([]);
@@ -14,8 +14,9 @@ export const TodoPage = () => {
         })();
     }, [])
 
-    const addTodo = (todo: Todo) => {
-        setTodos([...todos, todo]);
+    const handleAddTodo = async (todoToAdd: Todo) => {
+        const savedTodo = await addTodo(todoToAdd);
+        setTodos([...todos, savedTodo]);
     }
 
     const handleOpen = () => {
@@ -47,7 +48,7 @@ export const TodoPage = () => {
             <ul>
                 {todos.map(todo => <TodoItem todo={todo} handleToggle={handleToggle}/>)}
             </ul>
-            {isDialogOpen && <TodoDialog handleClose={handleClose} addTodo={addTodo}/>}
+            {isDialogOpen && <TodoDialog handleClose={handleClose} addTodo={handleAddTodo}/>}
         </>
     );
 };
