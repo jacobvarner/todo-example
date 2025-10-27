@@ -1,5 +1,5 @@
 import axios from "axios";
-import {addTodo, getTodos, toggleStatus} from "../TodoClient.ts";
+import {addTodo, editTodo, getTodos, toggleStatus} from "../TodoClient.ts";
 import {expect} from "vitest";
 import type {Todo} from "../Todo.ts";
 
@@ -56,4 +56,18 @@ describe('Todo Client', () => {
         const result = await toggleStatus(23);
         expect(result).toEqual(status);
     });
+
+    it('should call axios POST to update todo', async () => {
+        const testTodo: Todo = {
+            id: 2,
+            name: "Test todo",
+            description: "Test description",
+            status: "incomplete",
+            points: 5,
+            assignee: "Test person"
+        };
+        const axiosPostSpy = vi.spyOn(axios, 'post').mockResolvedValueOnce({});
+        await editTodo(testTodo);
+        expect(axiosPostSpy).toHaveBeenCalledWith("/api/todo/" + testTodo.id, testTodo);
+    })
 });

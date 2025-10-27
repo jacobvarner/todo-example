@@ -31,4 +31,9 @@ public class TodoService {
         }
         todoRepository.save(currentTodo);
     }
+
+    public void updateTodo(Todo updatedTodo) throws NoSuchElementException {
+        todoRepository.findById(updatedTodo.getId()).orElseThrow();
+        todoRepository.save(updatedTodo);
+    }
 }

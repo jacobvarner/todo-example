@@ -85,4 +85,35 @@ describe('Todo Page', () => {
         expect(await within(todo).findByRole("button", { name: "Mark Complete"})).toBeVisible();
         expect(toggleSpy).toHaveBeenCalledWith(1);
     });
+
+    it('should display "edit todo" modal when an edit button is clicked', async () => {
+        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        const user = userEvent.setup();
+        render(<TodoPage/>);
+        await user.click(await screen.findByRole("button", { name: "Edit"}));
+        expect(screen.getByRole("dialog", { name: "Edit Todo Dialog"})).toBeVisible();
+    });
+
+    it('should reset form when close is clicked', async () => {
+        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        const user = userEvent.setup();
+        render(<TodoPage/>);
+        await user.click(await screen.findByRole("button", { name: "Edit"}));
+        await user.click(screen.getByRole("button", { name: "Close"}));
+        await user.click(screen.getByRole("button", { name: "Add Todo"}));
+        expect(screen.getByRole("dialog", { name: "Add Todo Dialog"})).toBeVisible();
+    });
+
+    it('should reset form when submit is clicked', async () => {
+        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        vi.spyOn(TodoClient, 'addTodo').mockResolvedValueOnce({id: 2, name: "test 1", status: "incomplete"});
+        vi.spyOn(TodoClient, 'editTodo').mockResolvedValueOnce();
+        const user = userEvent.setup();
+        render(<TodoPage/>);
+        await user.click(await screen.findByRole("button", { name: "Edit"}));
+        await user.click(screen.getByRole("button", { name: "Submit"}));
+        await user.click(screen.getByRole("button", { name: "Add Todo"}));
+        expect(screen.getByRole("dialog", { name: "Add Todo Dialog"})).toBeVisible();
+    });
+
 })

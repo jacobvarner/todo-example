@@ -2,10 +2,11 @@ import {TodoItem} from "./TodoItem.tsx";
 import type {Todo} from "./Todo.ts";
 import {useEffect, useState} from "react";
 import {TodoDialog} from "./TodoDialog.tsx";
-import {addTodo, getTodos, toggleStatus} from "./TodoClient.ts";
+import {addTodo, editTodo, getTodos, toggleStatus} from "./TodoClient.ts";
 
 export const TodoPage = () => {
     const [todos, setTodos] = useState<Todo[]>([]);
+    const [currentTodo, setCurrentTodo] = useState<Todo | undefined>()
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
     useEffect(() => {
@@ -19,11 +20,22 @@ export const TodoPage = () => {
         setTodos([...todos, savedTodo]);
     }
 
+    const handleEditTodo = async (todoToUpdate: Todo) => {
+        await editTodo(todoToUpdate);
+        setTodos([...todos.map(todo => todo.id === todoToUpdate.id ? todoToUpdate : todo)])
+    }
+
+    const handleEdit = (todo: Todo) => {
+        setCurrentTodo(todo);
+        setIsDialogOpen(true);
+    }
+
     const handleOpen = () => {
         setIsDialogOpen(true);
     }
 
     const handleClose = () => {
+        setCurrentTodo(undefined);
         setIsDialogOpen(false);
     }
 
@@ -56,13 +68,11 @@ export const TodoPage = () => {
     return (
         <>
             <h2 className={"text-4xl text-black mb-4"}>My Todo Page</h2>
-            <button onClick={handleOpen} className={"border-black bg-gray-400 p-2 text-black w-[200px] h-[40px]"}>Add
-                Todo
-            </button>
+            <button onClick={handleOpen} className={"border-black bg-gray-400 p-2 text-black w-[200px] h-[40px]"}>Add Todo</button>
             <ul>
-                {todos.map(todo => <TodoItem key={todo.id} todo={todo} handleToggle={handleToggle}/>)}
+                {todos.map(todo => <TodoItem key={todo.id} todo={todo} handleToggle={handleToggle} handleEdit={handleEdit}/>)}
             </ul>
-            {isDialogOpen && <TodoDialog handleClose={handleClose} addTodo={handleAddTodo}/>}
+            {isDialogOpen && <TodoDialog handleClose={handleClose} addTodo={handleAddTodo} editTodo={handleEditTodo} todoToEdit={currentTodo}/>}
         </>
     );
 };

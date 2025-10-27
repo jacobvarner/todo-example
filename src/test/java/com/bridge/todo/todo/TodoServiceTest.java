@@ -72,7 +72,7 @@ class TodoServiceTest {
     }
 
     @Test
-    void toggleStatus_shouldThrowExceptionIfStatusDoesNotExist() {
+    void toggleStatus_shouldThrowExceptionIfTodoDoesNotExist() {
         when(mockTodoRepository.findById(17)).thenReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> todoService.toggleStatus(17));
     }
@@ -84,6 +84,30 @@ class TodoServiceTest {
         Todo updatedTodo = new Todo(58, "test 1", updated);
         when(mockTodoRepository.findById(58)).thenReturn(Optional.of(initialTodo));
         todoService.toggleStatus(initialTodo.getId());
+        verify(mockTodoRepository, times(1)).save(updatedTodo);
+    }
+
+    @Test
+    void updateTodo_shouldCallRepositoryToGetCurrentTodo() {
+        Todo testTodo = new Todo(14, "test 1");
+        when(mockTodoRepository.findById(testTodo.getId())).thenReturn(Optional.of(testTodo));
+        todoService.updateTodo(testTodo);
+        verify(mockTodoRepository, times(1)).findById(testTodo.getId());
+    }
+
+    @Test
+    void updateTodo_shouldThrowExceptionIfTodoDoesNotExist() {
+        Todo testTodoThatDoesNotExist = new Todo(14, "test 1");
+        when(mockTodoRepository.findById(testTodoThatDoesNotExist.getId())).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> todoService.updateTodo(testTodoThatDoesNotExist));
+    }
+
+    @Test
+    void updateTodo_shouldCallRepositoryToSaveUpdatedTodo() {
+        Todo initialTodo = new Todo(58, "test 1");
+        Todo updatedTodo = new Todo(58, "updated test 1");
+        when(mockTodoRepository.findById(initialTodo.getId())).thenReturn(Optional.of(initialTodo));
+        todoService.updateTodo(updatedTodo);
         verify(mockTodoRepository, times(1)).save(updatedTodo);
     }
 

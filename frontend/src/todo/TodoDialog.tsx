@@ -3,27 +3,40 @@ import type {Todo} from "./Todo.ts";
 
 interface TodoDialogProps {
     handleClose: () => void,
-    addTodo: (todo: Todo) => void
+    addTodo: (todo: Todo) => void,
+    editTodo: (todo: Todo) => void,
+    todoToEdit?: Todo
 }
-export const TodoDialog = ({handleClose, addTodo}: TodoDialogProps) => {
-    const [name, setName] = useState<string>();
-    const [description, setDescription] = useState<string>();
-    const [points, setPoints] = useState<number>(0);
-    const [assignee, setAssignee] = useState<string>();
+export const TodoDialog = ({handleClose, addTodo, editTodo, todoToEdit}: TodoDialogProps) => {
+    const [name, setName] = useState<string>(todoToEdit?.name ?? '');
+    const [description, setDescription] = useState<string>(todoToEdit?.description ?? '');
+    const [points, setPoints] = useState<number>(todoToEdit?.points ?? 0);
+    const [assignee, setAssignee] = useState<string | undefined>(todoToEdit?.assignee ?? '');
+
+    const handleBlank = (value: string, defaultValue: string) => {
+        if (value !== '') return value;
+        return defaultValue;
+    }
 
     const handleSubmit = () => {
-        addTodo({
-            name: name ?? "No Name",
-            description: description ?? "No Description",
+        const todoToSave: Todo = {
+            id: todoToEdit?.id ?? undefined,
+            name: handleBlank(name, "No Name"),
+            description: handleBlank(description, "No Description"),
             status: "incomplete",
             points: points,
-            assignee: assignee
-        });
+            assignee: assignee === '' ? undefined : assignee
+        }
+        if (todoToEdit) {
+            if (JSON.stringify(todoToSave) !== JSON.stringify(todoToEdit)) editTodo(todoToSave)
+        } else {
+            addTodo(todoToSave);
+        }
         handleClose();
     }
 
-    return <div role={"dialog"} aria-label={"Add Todo Dialog"} className={"border-2 border-black flex flex-col gap-2 w-[400px]"}>
-        <h2 className={"text-center text-2xl text-black"}>Add New Todo</h2>
+    return <div role={"dialog"} aria-label={todoToEdit ? "Edit Todo Dialog" : "Add Todo Dialog"} className={"border-2 border-black flex flex-col gap-2 w-[400px]"}>
+        <h2 className={"text-center text-2xl text-black"}>{todoToEdit ? "Edit Todo" : "Add New Todo"}</h2>
         <span className={"flex flex-row"}>
             <label htmlFor={"name"} className={"font-bold mx-2"}>Name</label>
             <input id={"name"}

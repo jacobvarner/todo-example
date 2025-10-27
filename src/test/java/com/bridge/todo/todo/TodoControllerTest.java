@@ -110,6 +110,37 @@ public class TodoControllerTest {
         }
     }
 
+    @Nested
+    class editTodo {
+        @Test
+        void shouldAcceptPostRequest() throws Exception {
+            Todo testTodo = new Todo(23, "test 1");
+            mvc.perform(post("/api/todo/" + testTodo.getId())
+                            .contentType(APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(testTodo)))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        void shouldCallTodoService() throws Exception {
+            Todo testTodo = new Todo(23, "test 1");
+            mvc.perform(post("/api/todo/" + testTodo.getId())
+                            .contentType(APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(testTodo)));
+            verify(mockTodoService, times(1)).updateTodo(testTodo);
+        }
+
+        @Test
+        void shouldReturnNotFoundWhenServiceThrowsANotFoundException() throws Exception {
+            Todo testTodo = new Todo(23, "test 1");
+            doThrow(new NoSuchElementException()).when(mockTodoService).updateTodo(testTodo);
+            mvc.perform(post("/api/todo/" + testTodo.getId())
+                    .contentType(APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(testTodo)))
+                    .andExpect(status().isNotFound());
+        }
+    }
+
 
 
 }

@@ -15,3 +15,7 @@ export const toggleStatus = async (idToToggle: number): Promise<number> => {
     const result = await axios.patch('/api/todo/' + idToToggle);
     return result.status;
 }
+
+export const editTodo = async (todoToEdit: Todo): Promise<void> => {
+    await axios.post("/api/todo/" + todoToEdit.id, todoToEdit);
+}

@@ -39,4 +39,14 @@ public class TodoController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @PostMapping("/{id}")
+    public ResponseEntity<Void> editTodo(@RequestBody Todo updatedTodo) {
+        try {
+            todoService.updateTodo(updatedTodo);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }
