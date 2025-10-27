@@ -1,33 +1,12 @@
-# todo
+# Todo Example
 
-<!-- TOC -->
-* [Spring Boot Starter](#starter-app)
-    * [About the project](#about-the-project)
-    * [Creating your new application](#creating-your-new-application)
-    * [Required Software](#required-software)
-    * [Running your application](#running-your-application)
-        * [Start dependent services](#start-dependent-services)
-        * [Start the Spring Boot application](#start-the-spring-boot-application)
-    * [Running Tests](#running-tests)
-<!-- TOC -->
+## About
 
-## About the project
-
-Project supporting Vite Testing with React Vite. react-vite-typescript testing app
-
-## Creating your new application
-
-1. Create a new project on [GitHub `Create New Project`](https://github.com)
-2. Create a new Spring Boot App [Spring Boot Starter `Create New App`](https://start.spring.io)
-
-### Required Software
-
-1. Docker Desktop Running
-2. Intellij
-3. Java 21
-4. Spring Boot Starter
+A classic todo example application to use as a reference and provide a simple configuration with Spring Boot, React, and TypeScript.
 
 ## Running your application
+
+The application currently runs as a separate frontend and backend, both instances will need to be running for it to function.
 
 ### Start dependent services
 
@@ -37,20 +16,23 @@ Run `docker-compose up -d` to start containers for Postgres
 
 By default, the application runs at [http://localhost:8080](http://localhost:8080).
 
-Run your application with one of the following commands:
+Run your application with the following commands:
 
 - MacOS: `./gradlew bootRun`
+- 
+### Start the React application
 
-To run your Application within a terminal of your IDE.
+As configured, the application runs at [http://localhost:3000](http://localhost:3000).
 
-```
--Djava.security.properties=src/main/dist/java.security
-```
+Run your application with the following commands:
+
+- MacOS: `cd frontennd && yarn dev`
 
 ## Running Tests
 
 - Run `docker compose up -d`
 
-| Tests to Run       | Command(s)                                         |
-|:-------------------|:---------------------------------------------------|
-| Backend            | Run `./gradlew test` in the project root directory |
+| Tests to Run | Command(s)                                         |
+|:-------------|:---------------------------------------------------|
+| Frontend     | Run `yarn test` in the `frontend` director         |
+| Backend      | Run `./gradlew test` in the project root directory |
