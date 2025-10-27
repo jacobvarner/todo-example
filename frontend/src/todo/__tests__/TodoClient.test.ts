@@ -18,7 +18,7 @@ describe('Todo Client', () => {
    })
 
     it('should call axios POST to add a todo', async () => {
-        const axiosSpy = vi.spyOn(axios, 'post');
+        const axiosSpy = vi.spyOn(axios, 'post').mockResolvedValueOnce({});
         const testTodoToAdd: Todo = {
             name: "Test todo",
             description: "Test description",

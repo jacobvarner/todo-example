@@ -20,7 +20,7 @@ describe('Todo Item', () => {
 
     it('should display a description for the todo', () => {
         render(<TodoItem todo={testTodo} handleToggle={vi.fn()}/>);
-        expect(screen.getByRole('paragraph', {name: "description"})).toHaveTextContent(testTodo.description);
+        expect(screen.getByRole('paragraph', {name: "description"})).toHaveTextContent(testTodo.description!);
     })
 
     it('should display the point value if it is greater than 0', () => {
