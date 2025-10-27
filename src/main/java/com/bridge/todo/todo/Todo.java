@@ -18,10 +18,17 @@ public class Todo {
     private String description;
     private Integer points;
     private String assignee;
+    private String status = "incomplete";
 
     public Todo(Integer id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public Todo(Integer id, String name, String status) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
     }
 
     public Todo(String name) {

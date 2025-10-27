@@ -19,7 +19,7 @@ By default, the application runs at [http://localhost:8080](http://localhost:808
 Run your application with the following commands:
 
 - MacOS: `./gradlew bootRun`
-- 
+
 ### Start the React application
 
 As configured, the application runs at [http://localhost:3000](http://localhost:3000).

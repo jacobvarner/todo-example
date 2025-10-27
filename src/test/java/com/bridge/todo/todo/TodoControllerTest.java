@@ -12,12 +12,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -85,6 +85,28 @@ public class TodoControllerTest {
                     .content(mapper.writeValueAsString(newTestTodo)))
                     .andExpect(content().json(mapper.writeValueAsString(createdTestTodo)));
 
+        }
+    }
+
+    @Nested
+    class toggleStatus {
+        @Test
+        void shouldAcceptPatchRequest() throws Exception {
+            mvc.perform(patch("/api/todo/" + 14)).andExpect(status().isOk());
+        }
+
+        @Test
+        void shouldCallTodoService() throws Exception {
+            Integer todoId = 14;
+            mvc.perform(patch("/api/todo/" + todoId));
+            verify(mockTodoService, times(1)).toggleStatus(todoId);
+        }
+
+        @Test
+        void shouldReturnNotFoundWhenServiceThrowsANotFoundException() throws Exception {
+            Integer nonExistentTodoId = 17;
+            doThrow(new NoSuchElementException()).when(mockTodoService).toggleStatus(nonExistentTodoId);
+            mvc.perform(patch("/api/todo/" + nonExistentTodoId)).andExpect(status().isNotFound());
         }
     }
 

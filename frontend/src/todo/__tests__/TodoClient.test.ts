@@ -1,5 +1,5 @@
 import axios from "axios";
-import {addTodo, getTodos} from "../TodoClient.ts";
+import {addTodo, getTodos, toggleStatus} from "../TodoClient.ts";
 import {expect} from "vitest";
 import type {Todo} from "../Todo.ts";
 
@@ -41,5 +41,19 @@ describe('Todo Client', () => {
         vi.spyOn(axios, 'post').mockResolvedValueOnce({ data: { ...testTodoToAdd, id: 1} });
         const result = await addTodo(testTodoToAdd);
         expect(result).toEqual({...testTodoToAdd, id: 1})
+    });
+
+    it('should call axios PATCH to toggle status', async () => {
+        const idToToggle = 34;
+        const axiosSpy = vi.spyOn(axios, 'patch').mockResolvedValueOnce({})
+        await toggleStatus(idToToggle);
+        expect(axiosSpy).toHaveBeenCalledWith("/api/todo/" + idToToggle);
+    });
+
+
+    it.each([200, 404])('should return %d status from patch request when result has %d status', async (status) => {
+        vi.spyOn(axios, 'patch').mockResolvedValueOnce({ status });
+        const result = await toggleStatus(23);
+        expect(result).toEqual(status);
     });
 });

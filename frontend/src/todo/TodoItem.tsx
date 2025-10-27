@@ -10,7 +10,7 @@ export const TodoItem = ({todo, handleToggle}: { todo: Todo, handleToggle: (id: 
                     {todo.description}
                 </p>
                 <span className={"flex flex-row"}>
-                    {todo.points > 0 && <p aria-label={"points value"} className={"mr-2"}>{todo.points} Points</p>}
+                    {!!todo.points && <p aria-label={"points value"} className={"mr-2"}>{todo.points} Points</p>}
                     {todo.assignee && <p aria-label={"assignee"} className={"italic"}>Assigned to {todo.assignee}</p>}
                 </span>
 
@@ -18,7 +18,7 @@ export const TodoItem = ({todo, handleToggle}: { todo: Todo, handleToggle: (id: 
             </div>
             <button
                 className={"align-bottom border-black bg-gray-600 p-2 text-white w-[200px] h-[40px]"}
-                onClick={() => handleToggle(todo.id)}>Mark {todo.status === "complete" ? "Incomplete" : "Complete"}</button>
+                onClick={() => handleToggle(todo.id!)}>Mark {todo.status === "complete" ? "Incomplete" : "Complete"}</button>
         </li>
     );
 }

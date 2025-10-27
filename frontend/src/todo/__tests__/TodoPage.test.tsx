@@ -46,6 +46,7 @@ describe('Todo Page', () => {
 
     it('should toggle a todo when clicked', async () => {
         vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        const toggleSpy = vi.spyOn(TodoClient, 'toggleStatus').mockResolvedValueOnce(200);
         render(<TodoPage/>);
         const user = userEvent.setup();
         const todo = await screen.findByRole("listitem", {name: "test 1"});
@@ -54,5 +55,34 @@ describe('Todo Page', () => {
             await user.click(markCompleteButton);
         })
         expect(await within(todo).findByRole("button", { name: "Mark Incomplete"})).toBeVisible();
+        expect(toggleSpy).toHaveBeenCalledWith(1);
     })
+
+    it('should not toggle status when client returns 404', async () => {
+        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        const toggleSpy = vi.spyOn(TodoClient, 'toggleStatus').mockResolvedValueOnce(404);
+        render(<TodoPage/>);
+        const user = userEvent.setup();
+        const todo = await screen.findByRole("listitem", {name: "test 1"});
+        const markCompleteButton = within(todo).getByRole("button", {name: "Mark Complete"});
+        await act(async () => {
+            await user.click(markCompleteButton);
+        })
+        expect(await within(todo).findByRole("button", { name: "Mark Complete"})).toBeVisible();
+        expect(toggleSpy).toHaveBeenCalledWith(1);
+    });
+
+    it('should not toggle status when client request is rejected', async () => {
+        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        const toggleSpy = vi.spyOn(TodoClient, 'toggleStatus').mockRejectedValueOnce({});
+        render(<TodoPage/>);
+        const user = userEvent.setup();
+        const todo = await screen.findByRole("listitem", {name: "test 1"});
+        const markCompleteButton = within(todo).getByRole("button", {name: "Mark Complete"});
+        await act(async () => {
+            await user.click(markCompleteButton);
+        })
+        expect(await within(todo).findByRole("button", { name: "Mark Complete"})).toBeVisible();
+        expect(toggleSpy).toHaveBeenCalledWith(1);
+    });
 })

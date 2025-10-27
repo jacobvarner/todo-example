@@ -10,3 +10,8 @@ export const addTodo = async (todoToAdd: Todo): Promise<Todo> => {
     const result = await axios.post('/api/todo', todoToAdd);
     return result.data;
 }
+
+export const toggleStatus = async (idToToggle: number): Promise<number> => {
+    const result = await axios.patch('/api/todo/' + idToToggle);
+    return result.status;
+}

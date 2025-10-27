@@ -2,13 +2,18 @@ package com.bridge.todo.todo;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,6 +61,30 @@ class TodoServiceTest {
 
         Todo result = todoService.addTodo(newTestTodo);
         assertEquals(createdTestTodo, result);
+    }
+
+    @Test
+    void toggleStatus_shouldCallRepositoryToGetCurrentStatus() {
+        Todo testTodo = new Todo(23, "test 1");
+        when(mockTodoRepository.findById(23)).thenReturn(Optional.of(testTodo));
+        todoService.toggleStatus(23);
+        verify(mockTodoRepository, times(1)).findById(23);
+    }
+
+    @Test
+    void toggleStatus_shouldThrowExceptionIfStatusDoesNotExist() {
+        when(mockTodoRepository.findById(17)).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> todoService.toggleStatus(17));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"incomplete,complete", "complete,incomplete"})
+    void toggleStatus_shouldCallRepositoryWithOtherStatus(String initial, String updated) {
+        Todo initialTodo = new Todo(58, "test 1", initial);
+        Todo updatedTodo = new Todo(58, "test 1", updated);
+        when(mockTodoRepository.findById(58)).thenReturn(Optional.of(initialTodo));
+        todoService.toggleStatus(initialTodo.getId());
+        verify(mockTodoRepository, times(1)).save(updatedTodo);
     }
 
 }

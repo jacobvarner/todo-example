@@ -1,0 +1,2 @@
+ALTER TABLE todo
+ADD COLUMN status TEXT NOT NULL DEFAULT 'incomplete';
