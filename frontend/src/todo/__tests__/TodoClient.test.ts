@@ -23,8 +23,7 @@ describe('Todo Client', () => {
             name: "Test todo",
             description: "Test description",
             assignee: "Test person",
-            points: 5,
-            status: "incomplete"
+            points: 5
         }
         await addTodo(testTodoToAdd);
         expect(axiosSpy).toHaveBeenCalledWith('/api/todo', testTodoToAdd);
@@ -35,8 +34,7 @@ describe('Todo Client', () => {
             name: "Test todo",
             description: "Test description",
             assignee: "Test person",
-            points: 5,
-            status: "incomplete"
+            points: 5
         }
         vi.spyOn(axios, 'post').mockResolvedValueOnce({ data: { ...testTodoToAdd, id: 1} });
         const result = await addTodo(testTodoToAdd);

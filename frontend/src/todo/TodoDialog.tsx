@@ -15,7 +15,6 @@ export const TodoDialog = ({handleClose, addTodo}: TodoDialogProps) => {
         addTodo({
             name: name ?? "No Name",
             description: description ?? "No Description",
-            status: "incomplete",
             points: points,
             assignee: assignee
         });
