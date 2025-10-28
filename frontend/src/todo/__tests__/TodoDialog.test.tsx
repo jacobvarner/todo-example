@@ -3,8 +3,10 @@ import {render, screen} from "@testing-library/react";
 import {describe, expect} from "vitest";
 import {userEvent} from "@testing-library/user-event";
 import type {Todo} from "../Todo.ts";
+import * as ReactRouter from 'react-router';
 
 describe('TodoDialog', () => {
+    vi.spyOn(ReactRouter, 'useParams').mockReturnValue({ id: "12" })
     it('should have a title', () => {
         render(<TodoDialog handleClose={vi.fn()} editTodo={vi.fn()} addTodo={vi.fn()}/>);
         expect(screen.getByRole("heading", { name: "Add New Todo"})).toBeVisible();
@@ -60,7 +62,8 @@ describe('TodoDialog', () => {
             name: "No Name",
             description: "No Description",
             status: "incomplete",
-            points: 0
+            points: 0,
+            listId: 12
         });
     })
 
@@ -71,7 +74,8 @@ describe('TodoDialog', () => {
             description: "Test Description",
             status: "incomplete",
             points: 5,
-            assignee: "Test Person"
+            assignee: "Test Person",
+            listId: 12
         }
         const user = userEvent.setup();
         render(<TodoDialog handleClose={vi.fn()} editTodo={vi.fn()} addTodo={mockAddTodo}/>);
@@ -84,15 +88,16 @@ describe('TodoDialog', () => {
     });
 
     it('should render form with values if editing todo', () => {
-        const testTodo = {
-            "id": 1,
-            "name": "Test Todo",
-            "description": "Test Description",
-            "status": "incomplete",
-            "points": 5,
-            assignee: "Test Person"
+        const testTodo: Todo = {
+            id: 1,
+            name: "Test Todo",
+            description: "Test Description",
+            status: "incomplete",
+            points: 5,
+            assignee: "Test Person",
+            listId: 12
         }
-        render(<TodoDialog handleClose={vi.fn()} editTodo={vi.fn()} addTodo={vi.fn()} todoToEdit={testTodo as Todo} />);
+        render(<TodoDialog handleClose={vi.fn()} editTodo={vi.fn()} addTodo={vi.fn()} todoToEdit={testTodo} />);
         expect(screen.getByRole("textbox", { name: "Name"})).toHaveValue(testTodo.name);
         expect(screen.getByRole("textbox", { name: "Description"})).toHaveValue(testTodo.description);
         expect(screen.getByRole("textbox", { name: "Assign to"})).toHaveValue(testTodo.assignee);
@@ -100,16 +105,17 @@ describe('TodoDialog', () => {
     });
 
     it('should call edit todo when values change and form is submitted', async () => {
-        const testTodo = {
+        const testTodo: Todo = {
             id: 1,
             name: "Test Todo",
             description: "Test Description",
             status: "incomplete",
             points: 5,
-            assignee: "Test Person"
+            assignee: "Test Person",
+            listId: 12
         }
         const mockedEdit = vi.fn()
-        render(<TodoDialog handleClose={vi.fn()}  addTodo={vi.fn()} editTodo={mockedEdit} todoToEdit={testTodo as Todo} />);
+        render(<TodoDialog handleClose={vi.fn()}  addTodo={vi.fn()} editTodo={mockedEdit} todoToEdit={testTodo} />);
         const user = userEvent.setup();
         const nameInput = screen.getByRole("textbox", { name: "Name"});
         await user.clear(nameInput)
@@ -119,17 +125,18 @@ describe('TodoDialog', () => {
     });
 
     it('should call neither save or edit if no changes are made', async () => {
-        const testTodo = {
+        const testTodo: Todo = {
             id: 1,
             name: "Test Todo",
             description: "Test Description",
             status: "incomplete",
             points: 5,
-            assignee: "Test Person"
+            assignee: "Test Person",
+            listId: 12
         }
         const mockedEdit = vi.fn();
         const mockedAdd = vi.fn();
-        render(<TodoDialog handleClose={vi.fn()}  addTodo={mockedAdd} editTodo={mockedEdit} todoToEdit={testTodo as Todo} />);
+        render(<TodoDialog handleClose={vi.fn()}  addTodo={mockedAdd} editTodo={mockedEdit} todoToEdit={testTodo} />);
         const user = userEvent.setup();
         await user.click(screen.getByRole("button", { name: "Submit"}));
         expect(mockedAdd).toHaveBeenCalledTimes(0);

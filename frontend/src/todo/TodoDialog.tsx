@@ -1,5 +1,6 @@
 import {useState} from "react";
 import type {Todo} from "./Todo.ts";
+import {useParams} from "react-router";
 
 interface TodoDialogProps {
     handleClose: () => void,
@@ -8,6 +9,7 @@ interface TodoDialogProps {
     todoToEdit?: Todo
 }
 export const TodoDialog = ({handleClose, addTodo, editTodo, todoToEdit}: TodoDialogProps) => {
+    const { id } = useParams();
     const [name, setName] = useState<string>(todoToEdit?.name ?? '');
     const [description, setDescription] = useState<string>(todoToEdit?.description ?? '');
     const [points, setPoints] = useState<number>(todoToEdit?.points ?? 0);
@@ -25,7 +27,8 @@ export const TodoDialog = ({handleClose, addTodo, editTodo, todoToEdit}: TodoDia
             description: handleBlank(description, "No Description"),
             status: "incomplete",
             points: points,
-            assignee: assignee === '' ? undefined : assignee
+            assignee: assignee === '' ? undefined : assignee,
+            listId: Number(id)
         }
         if (todoToEdit) {
             if (JSON.stringify(todoToSave) !== JSON.stringify(todoToEdit)) editTodo(todoToSave)

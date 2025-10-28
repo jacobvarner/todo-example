@@ -4,5 +4,6 @@ export type Todo = {
     description?: string,
     status: "complete" | "incomplete" | "archived",
     points?: number,
-    assignee?: string
+    assignee?: string,
+    listId?: number
 }

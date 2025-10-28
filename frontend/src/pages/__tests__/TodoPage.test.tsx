@@ -4,18 +4,22 @@ import { TodoPage } from "../TodoPage.tsx";
 import {userEvent} from "@testing-library/user-event";
 import * as TodoClient from "../../todo/TodoClient.ts"
 import {act} from "react";
+import * as ReactRouter from 'react-router';
+import * as TodoListClient from '../../todoList/TodoListClient'
 
 describe('Todo Page', () => {
     vi.spyOn(TodoClient, 'getTodos').mockResolvedValue([]);
+    vi.spyOn(ReactRouter, 'useParams').mockReturnValue({id: "23"});
+    vi.spyOn(TodoListClient, 'getTodoList').mockResolvedValue({ id: 23, name: "Test 23", description: "23rd todo list", todos: []})
 
     it('should display the title', async () => {
         render(<TodoPage/>)
-        expect(screen.getByRole("heading", {name: /my todo page/i})).toBeVisible()
+        expect(await screen.findByRole("heading", {name: /Test 23/i})).toBeVisible();
     })
 
-    it('should show a button to add todos', () => {
+    it('should show a button to add todos', async () => {
         render(<TodoPage/>);
-        expect(screen.getByRole("button", { name: "Add Todo"})).toBeVisible();
+        expect(await screen.findByRole("button", { name: "Add Todo"})).toBeVisible();
     })
 
     it('should not show "add todo" modal on load', () => {
@@ -26,26 +30,26 @@ describe('Todo Page', () => {
     it('should display "add todo" modal when add button is clicked', async () => {
         const user = userEvent.setup();
         render(<TodoPage/>);
-        await user.click(screen.getByRole("button", { name: "Add Todo"}));
+        await user.click(await screen.findByRole("button", { name: "Add Todo"}));
         expect(screen.getByRole("dialog", { name: "Add Todo Dialog"})).toBeVisible();
     })
 
     it('should close "add todo" modal when close button is clicked', async () => {
         const user = userEvent.setup();
         render(<TodoPage/>);
-        await user.click(screen.getByRole("button", { name: "Add Todo"}));
+        await user.click(await screen.findByRole("button", { name: "Add Todo"}));
         await user.click(screen.getByRole("button", { name: "Close"}));
         expect(screen.queryByRole("dialog", { name: "Add Todo Dialog"})).toBeNull();
     })
 
     it('should display all todos', async () => {
-        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}, {id: 2, name: "test 2", status: "incomplete"}]);
+        vi.spyOn(TodoListClient, 'getTodoList').mockResolvedValueOnce({ id: 23, name: "Test 23", description: "23rd todo list", todos: [{id: 1, name: "test 1", status: "incomplete"}, {id: 2, name: "test 2", status: "incomplete"}]})
         render(<TodoPage/>);
         expect(await screen.findAllByRole("listitem")).toHaveLength(2);
     })
 
     it('should toggle a todo when clicked', async () => {
-        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        vi.spyOn(TodoListClient, 'getTodoList').mockResolvedValueOnce({ id: 23, name: "Test 23", description: "23rd todo list", todos: [{id: 1, name: "test 1", status: "incomplete"}]})
         const toggleSpy = vi.spyOn(TodoClient, 'toggleStatus').mockResolvedValueOnce(200);
         render(<TodoPage/>);
         const user = userEvent.setup();
@@ -59,7 +63,7 @@ describe('Todo Page', () => {
     })
 
     it('should not toggle status when client returns 404', async () => {
-        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        vi.spyOn(TodoListClient, 'getTodoList').mockResolvedValueOnce({ id: 23, name: "Test 23", description: "23rd todo list", todos: [{id: 1, name: "test 1", status: "incomplete"}]})
         const toggleSpy = vi.spyOn(TodoClient, 'toggleStatus').mockResolvedValueOnce(404);
         render(<TodoPage/>);
         const user = userEvent.setup();
@@ -73,7 +77,7 @@ describe('Todo Page', () => {
     });
 
     it('should not toggle status when client request is rejected', async () => {
-        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        vi.spyOn(TodoListClient, 'getTodoList').mockResolvedValueOnce({ id: 23, name: "Test 23", description: "23rd todo list", todos: [{id: 1, name: "test 1", status: "incomplete"}]})
         const toggleSpy = vi.spyOn(TodoClient, 'toggleStatus').mockRejectedValueOnce({});
         render(<TodoPage/>);
         const user = userEvent.setup();
@@ -87,7 +91,7 @@ describe('Todo Page', () => {
     });
 
     it('should display "edit todo" modal when an edit button is clicked', async () => {
-        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        vi.spyOn(TodoListClient, 'getTodoList').mockResolvedValueOnce({ id: 23, name: "Test 23", description: "23rd todo list", todos: [{id: 1, name: "test 1", status: "incomplete"}]})
         const user = userEvent.setup();
         render(<TodoPage/>);
         await user.click(await screen.findByRole("button", { name: "Edit"}));
@@ -95,7 +99,7 @@ describe('Todo Page', () => {
     });
 
     it('should reset form when close is clicked', async () => {
-        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        vi.spyOn(TodoListClient, 'getTodoList').mockResolvedValueOnce({ id: 23, name: "Test 23", description: "23rd todo list", todos: [{id: 1, name: "test 1", status: "incomplete"}]})
         const user = userEvent.setup();
         render(<TodoPage/>);
         await user.click(await screen.findByRole("button", { name: "Edit"}));
@@ -105,7 +109,7 @@ describe('Todo Page', () => {
     });
 
     it('should reset form when submit is clicked', async () => {
-        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        vi.spyOn(TodoListClient, 'getTodoList').mockResolvedValueOnce({ id: 23, name: "Test 23", description: "23rd todo list", todos: [{id: 1, name: "test 1", status: "incomplete"}]})
         vi.spyOn(TodoClient, 'addTodo').mockResolvedValueOnce({id: 2, name: "test 1", status: "incomplete"});
         vi.spyOn(TodoClient, 'editTodo').mockResolvedValueOnce();
         const user = userEvent.setup();
@@ -117,7 +121,7 @@ describe('Todo Page', () => {
     });
 
     it('should archive a todo when clicked', async () => {
-        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        vi.spyOn(TodoListClient, 'getTodoList').mockResolvedValueOnce({ id: 23, name: "Test 23", description: "23rd todo list", todos: [{id: 1, name: "test 1", status: "incomplete"}]})
         const toggleSpy = vi.spyOn(TodoClient, 'toggleArchive').mockResolvedValueOnce(200);
         render(<TodoPage/>);
         const user = userEvent.setup();
@@ -131,7 +135,7 @@ describe('Todo Page', () => {
     })
 
     it('should not archive when client returns 404', async () => {
-        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        vi.spyOn(TodoListClient, 'getTodoList').mockResolvedValueOnce({ id: 23, name: "Test 23", description: "23rd todo list", todos: [{id: 1, name: "test 1", status: "incomplete"}]})
         const toggleSpy = vi.spyOn(TodoClient, 'toggleArchive').mockResolvedValueOnce(404);
         render(<TodoPage/>);
         const user = userEvent.setup();
@@ -145,17 +149,10 @@ describe('Todo Page', () => {
     });
 
     it('should not show archived todos', async () => {
-        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce(
-            [
-                {id: 1, name: "test 1", status: "incomplete"},
-                {id: 2, name: "test 2", status: "complete"},
-                {id: 3, name: "test 3", status: "archived"}
-            ]
-        );
+        vi.spyOn(TodoListClient, 'getTodoList').mockResolvedValueOnce({ id: 23, name: "Test 23", description: "23rd todo list", todos: [{id: 1, name: "test 1", status: "incomplete"}, {id: 2, name: "test 2", status: "archived"}]})
         render(<TodoPage/>);
         expect(await screen.findByRole("listitem", { name: "test 1"})).toBeVisible();
-        expect(screen.getByRole("listitem", { name: "test 2"})).toBeVisible();
-        expect(screen.queryByRole("listitem", { name: "test 3"})).toBeNull();
+        expect(screen.queryByRole("listitem", { name: "test 2"})).toBeNull();
     })
 
 })

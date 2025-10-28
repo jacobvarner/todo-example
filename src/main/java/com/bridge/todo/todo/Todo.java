@@ -20,6 +20,9 @@ public class Todo {
     private String assignee;
     private String status = "incomplete";
 
+    @JoinColumn(name = "list_id")
+    private Integer listId;
+
     public Todo(Integer id, String name) {
         this.id = id;
         this.name = name;
