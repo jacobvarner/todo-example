@@ -36,4 +36,14 @@ public class TodoService {
         todoRepository.findById(updatedTodo.getId()).orElseThrow();
         todoRepository.save(updatedTodo);
     }
+
+    public void toggleArchive(Integer todoId) throws NoSuchElementException {
+        Todo currentTodo = todoRepository.findById(todoId).orElseThrow();
+        if (currentTodo.getStatus().equals("archived")) {
+            currentTodo.setStatus("incomplete");
+        } else {
+            currentTodo.setStatus("archived");
+        }
+        todoRepository.save(currentTodo);
+    }
 }

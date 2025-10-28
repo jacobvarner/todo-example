@@ -12,10 +12,15 @@ export const addTodo = async (todoToAdd: Todo): Promise<Todo> => {
 }
 
 export const toggleStatus = async (idToToggle: number): Promise<number> => {
-    const result = await axios.patch('/api/todo/' + idToToggle);
+    const result = await axios.patch('/api/todo/status/' + idToToggle);
     return result.status;
 }
 
 export const editTodo = async (todoToEdit: Todo): Promise<void> => {
     await axios.post("/api/todo/" + todoToEdit.id, todoToEdit);
+}
+
+export const toggleArchive = async (idToToggle: number): Promise<number> => {
+    const result = await axios.patch('/api/todo/archive/' + idToToggle);
+    return result.status;
 }

@@ -111,4 +111,28 @@ class TodoServiceTest {
         verify(mockTodoRepository, times(1)).save(updatedTodo);
     }
 
+    @Test
+    void toggleArchive_shouldCallRepositoryToGetCurrentStatus() {
+        Todo testTodo = new Todo(42, "test 1");
+        when(mockTodoRepository.findById(42)).thenReturn(Optional.of(testTodo));
+        todoService.toggleArchive(42);
+        verify(mockTodoRepository, times(1)).findById(42);
+    }
+
+    @Test
+    void toggleArchive_shouldThrowExceptionIfTodoDoesNotExist() {
+        when(mockTodoRepository.findById(15)).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> todoService.toggleArchive(15));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"incomplete,archived", "complete,archived", "archived,incomplete"})
+    void toggleArchive_shouldCallRepositoryWithArchiveOrStatus(String initial, String updated) {
+        Todo initialTodo = new Todo(76, "test 1", initial);
+        Todo updatedTodo = new Todo(76, "test 1", updated);
+        when(mockTodoRepository.findById(76)).thenReturn(Optional.of(initialTodo));
+        todoService.toggleArchive(initialTodo.getId());
+        verify(mockTodoRepository, times(1)).save(updatedTodo);
+    }
+
 }

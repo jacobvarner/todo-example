@@ -2,7 +2,7 @@ import {render, screen, within} from "@testing-library/react";
 import {describe, expect, it} from "vitest";
 import { TodoPage } from "../TodoPage.tsx";
 import {userEvent} from "@testing-library/user-event";
-import * as TodoClient from "../TodoClient.ts"
+import * as TodoClient from "../../todo/TodoClient.ts"
 import {act} from "react";
 
 describe('Todo Page', () => {
@@ -115,5 +115,47 @@ describe('Todo Page', () => {
         await user.click(screen.getByRole("button", { name: "Add Todo"}));
         expect(screen.getByRole("dialog", { name: "Add Todo Dialog"})).toBeVisible();
     });
+
+    it('should archive a todo when clicked', async () => {
+        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        const toggleSpy = vi.spyOn(TodoClient, 'toggleArchive').mockResolvedValueOnce(200);
+        render(<TodoPage/>);
+        const user = userEvent.setup();
+        const todo = await screen.findByRole("listitem", {name: "test 1"});
+        const archiveButton = within(todo).getByRole("button", {name: "Archive"});
+        await act(async () => {
+            await user.click(archiveButton);
+        })
+        expect(toggleSpy).toHaveBeenCalledWith(1);
+        expect(screen.queryByRole("listitem", { name: "test 1"})).toBeNull();
+    })
+
+    it('should not archive when client returns 404', async () => {
+        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce([{id: 1, name: "test 1", status: "incomplete"}]);
+        const toggleSpy = vi.spyOn(TodoClient, 'toggleArchive').mockResolvedValueOnce(404);
+        render(<TodoPage/>);
+        const user = userEvent.setup();
+        const todo = await screen.findByRole("listitem", {name: "test 1"});
+        const archiveButton = within(todo).getByRole("button", {name: "Archive"});
+        await act(async () => {
+            await user.click(archiveButton);
+        })
+        expect(todo).toBeVisible();
+        expect(toggleSpy).toHaveBeenCalledWith(1);
+    });
+
+    it('should not show archived todos', async () => {
+        vi.spyOn(TodoClient, 'getTodos').mockResolvedValueOnce(
+            [
+                {id: 1, name: "test 1", status: "incomplete"},
+                {id: 2, name: "test 2", status: "complete"},
+                {id: 3, name: "test 3", status: "archived"}
+            ]
+        );
+        render(<TodoPage/>);
+        expect(await screen.findByRole("listitem", { name: "test 1"})).toBeVisible();
+        expect(screen.getByRole("listitem", { name: "test 2"})).toBeVisible();
+        expect(screen.queryByRole("listitem", { name: "test 3"})).toBeNull();
+    })
 
 })

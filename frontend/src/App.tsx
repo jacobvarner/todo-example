@@ -1,10 +1,13 @@
 import './App.css'
-import {TodoPage} from "./todo/TodoPage.tsx";
+import {BrowserRouter} from "react-router";
+import {ApplicationRoutes} from "./ApplicationRoutes.tsx";
 
 function App() {
 
   return (
-          <TodoPage />
+          <BrowserRouter>
+              <ApplicationRoutes />
+          </BrowserRouter>
   )
 }
 

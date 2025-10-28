@@ -14,49 +14,49 @@ const testTodo: Todo = {
 
 describe('Todo Item', () => {
     it('should display a title for the todo', () => {
-        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()}/>);
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()} handleArchive={vi.fn()}/>);
         expect(screen.getByRole("heading", {name: testTodo.name})).toBeVisible();
     });
 
     it('should display a description for the todo', () => {
-        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()}/>);
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()} handleArchive={vi.fn()}/>);
         expect(screen.getByRole('paragraph', {name: "description"})).toHaveTextContent(testTodo.description!);
     })
 
     it('should display the point value if it is greater than 0', () => {
-        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()}/>);
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()} handleArchive={vi.fn()}/>);
         expect(screen.getByRole('paragraph', {name: "points value"})).toHaveTextContent(testTodo.points + " Points");
     })
 
     it('should not display the point value if it is worth 0 points', () => {
-        render(<TodoItem todo={{...testTodo, points: 0}} handleToggle={vi.fn()} handleEdit={vi.fn()}/>);
+        render(<TodoItem todo={{...testTodo, points: 0}} handleToggle={vi.fn()} handleEdit={vi.fn()} handleArchive={vi.fn()}/>);
         expect(screen.queryByRole("paragraph", { name: "points value"})).toBeNull();
     })
 
     it('should display the assignee if there is one', () => {
-        render(<TodoItem todo={{...testTodo, assignee: "Person 1"}} handleToggle={vi.fn()} handleEdit={vi.fn()}/>);
+        render(<TodoItem todo={{...testTodo, assignee: "Person 1"}} handleToggle={vi.fn()} handleEdit={vi.fn()} handleArchive={vi.fn()}/>);
         expect(screen.getByRole('paragraph', {name: "assignee"})).toHaveTextContent("Person 1");
     })
 
     it('should not display the assignee if there is not someone assigned', () => {
-        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()}/>);
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()} handleArchive={vi.fn()}/>);
         expect(screen.queryByRole("paragraph", { name: "assignee"})).toBeNull();
     })
 
     it('should display a button to complete the todo if it is incomplete', () => {
-        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()}/>);
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()} handleArchive={vi.fn()}/>);
         expect(screen.getByRole("button", {name: "Mark Complete"})).toBeVisible();
     })
 
     it('should display a button to un-complete the todo if it has accidentally been completed', () => {
-        render(<TodoItem todo={{...testTodo, status: "complete"}} handleToggle={vi.fn()} handleEdit={vi.fn()}/>);
+        render(<TodoItem todo={{...testTodo, status: "complete"}} handleToggle={vi.fn()} handleEdit={vi.fn()} handleArchive={vi.fn()}/>);
         expect(screen.getByRole("button", {name: "Mark Incomplete"})).toBeVisible();
     })
 
     it('should call a handleToggle function when complete button is clicked', async () => {
         const mockHandleToggle = vi.fn();
         const user = userEvent.setup();
-        render(<TodoItem todo={testTodo} handleToggle={mockHandleToggle} handleEdit={vi.fn()}/>);
+        render(<TodoItem todo={testTodo} handleToggle={mockHandleToggle} handleEdit={vi.fn()} handleArchive={vi.fn()}/>);
         await user.click(screen.getByRole("button", { name: "Mark Complete"}));
         expect(mockHandleToggle).toHaveBeenCalledWith(testTodo.id);
     })
@@ -64,21 +64,47 @@ describe('Todo Item', () => {
     it('should call a handleToggle function when incomplete button is clicked', async () => {
         const mockHandleToggle = vi.fn();
         const user = userEvent.setup();
-        render(<TodoItem todo={{...testTodo, status: "complete"}} handleToggle={mockHandleToggle} handleEdit={vi.fn()}/>);
+        render(<TodoItem todo={{...testTodo, status: "complete"}} handleToggle={mockHandleToggle} handleEdit={vi.fn()} handleArchive={vi.fn()}/>);
         await user.click(screen.getByRole("button", { name: "Mark Incomplete"}));
         expect(mockHandleToggle).toHaveBeenCalledWith(testTodo.id);
     })
 
     it('should have an edit button', () => {
-        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()} />);
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()} handleArchive={vi.fn()} />);
         expect(screen.getByRole('button', { name: "Edit"})).toBeVisible();
     })
 
     it('should call handleEdit when edit button is clicked', async () => {
         const mockedHandleEdit = vi.fn()
-        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={mockedHandleEdit} />);
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={mockedHandleEdit} handleArchive={vi.fn()}/>);
         const user = userEvent.setup();
         await user.click(screen.getByRole('button', { name: "Edit"}));
         expect(mockedHandleEdit).toHaveBeenCalledWith(testTodo);
+    })
+
+    it('should display a button to archive the todo if it is unarchived', () => {
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleEdit={vi.fn()} handleArchive={vi.fn()}/>);
+        expect(screen.getByRole("button", {name: "Archive"})).toBeVisible();
+    })
+
+    it('should display a button to restore the todo if it has accidentally been archived', () => {
+        render(<TodoItem todo={{...testTodo, status: "archived"}} handleToggle={vi.fn()} handleEdit={vi.fn()} handleArchive={vi.fn()}/>);
+        expect(screen.getByRole("button", {name: "Restore"})).toBeVisible();
+    })
+
+    it('should call a handleArchive function when archive button is clicked', async () => {
+        const mockHandleArchive = vi.fn();
+        const user = userEvent.setup();
+        render(<TodoItem todo={testTodo} handleToggle={vi.fn()} handleArchive={mockHandleArchive} handleEdit={vi.fn()}/>);
+        await user.click(screen.getByRole("button", { name: "Archive"}));
+        expect(mockHandleArchive).toHaveBeenCalledWith(testTodo.id);
+    })
+
+    it('should call a handleArchive function when restore button is clicked', async () => {
+        const mockHandleArchive = vi.fn();
+        const user = userEvent.setup();
+        render(<TodoItem todo={{...testTodo, status: "archived"}} handleToggle={vi.fn()} handleArchive={mockHandleArchive} handleEdit={vi.fn()}/>);
+        await user.click(screen.getByRole("button", { name: "Restore"}));
+        expect(mockHandleArchive).toHaveBeenCalledWith(testTodo.id);
     })
 });

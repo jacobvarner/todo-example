@@ -1,5 +1,5 @@
 import axios from "axios";
-import {addTodo, editTodo, getTodos, toggleStatus} from "../TodoClient.ts";
+import {addTodo, editTodo, getTodos, toggleArchive, toggleStatus} from "../TodoClient.ts";
 import {expect} from "vitest";
 import type {Todo} from "../Todo.ts";
 
@@ -47,7 +47,7 @@ describe('Todo Client', () => {
         const idToToggle = 34;
         const axiosSpy = vi.spyOn(axios, 'patch').mockResolvedValueOnce({})
         await toggleStatus(idToToggle);
-        expect(axiosSpy).toHaveBeenCalledWith("/api/todo/" + idToToggle);
+        expect(axiosSpy).toHaveBeenCalledWith("/api/todo/status/" + idToToggle);
     });
 
 
@@ -69,5 +69,19 @@ describe('Todo Client', () => {
         const axiosPostSpy = vi.spyOn(axios, 'post').mockResolvedValueOnce({});
         await editTodo(testTodo);
         expect(axiosPostSpy).toHaveBeenCalledWith("/api/todo/" + testTodo.id, testTodo);
-    })
+    });
+
+    it('should call axios PATCH to toggle archive', async () => {
+        const idToToggle = 34;
+        const axiosSpy = vi.spyOn(axios, 'patch').mockResolvedValueOnce({})
+        await toggleArchive(idToToggle);
+        expect(axiosSpy).toHaveBeenCalledWith("/api/todo/archive/" + idToToggle);
+    });
+
+
+    it.each([200, 404])('should return %d status from archive patch request when result has %d status', async (status) => {
+        vi.spyOn(axios, 'patch').mockResolvedValueOnce({ status });
+        const result = await toggleArchive(23);
+        expect(result).toEqual(status);
+    });
 });

@@ -3,18 +3,14 @@ package com.bridge.todo.todo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -92,13 +88,13 @@ public class TodoControllerTest {
     class toggleStatus {
         @Test
         void shouldAcceptPatchRequest() throws Exception {
-            mvc.perform(patch("/api/todo/" + 14)).andExpect(status().isOk());
+            mvc.perform(patch("/api/todo/status/" + 14)).andExpect(status().isOk());
         }
 
         @Test
         void shouldCallTodoService() throws Exception {
             Integer todoId = 14;
-            mvc.perform(patch("/api/todo/" + todoId));
+            mvc.perform(patch("/api/todo/status/" + todoId));
             verify(mockTodoService, times(1)).toggleStatus(todoId);
         }
 
@@ -106,7 +102,7 @@ public class TodoControllerTest {
         void shouldReturnNotFoundWhenServiceThrowsANotFoundException() throws Exception {
             Integer nonExistentTodoId = 17;
             doThrow(new NoSuchElementException()).when(mockTodoService).toggleStatus(nonExistentTodoId);
-            mvc.perform(patch("/api/todo/" + nonExistentTodoId)).andExpect(status().isNotFound());
+            mvc.perform(patch("/api/todo/status/" + nonExistentTodoId)).andExpect(status().isNotFound());
         }
     }
 
@@ -138,6 +134,28 @@ public class TodoControllerTest {
                     .contentType(APPLICATION_JSON)
                     .content(mapper.writeValueAsString(testTodo)))
                     .andExpect(status().isNotFound());
+        }
+    }
+
+    @Nested
+    class toggleArchive {
+        @Test
+        void shouldAcceptPatchRequest() throws Exception {
+            mvc.perform(patch("/api/todo/archive/" + 55)).andExpect(status().isOk());
+        }
+
+        @Test
+        void shouldCallTodoService() throws Exception {
+            Integer todoId = 23;
+            mvc.perform(patch("/api/todo/archive/" + todoId));
+            verify(mockTodoService, times(1)).toggleArchive(todoId);
+        }
+
+        @Test
+        void shouldReturnNotFoundWhenServiceThrowsANotFoundException() throws Exception {
+            Integer nonExistentTodoId = 34;
+            doThrow(new NoSuchElementException()).when(mockTodoService).toggleArchive(nonExistentTodoId);
+            mvc.perform(patch("/api/todo/archive/" + nonExistentTodoId)).andExpect(status().isNotFound());
         }
     }
 

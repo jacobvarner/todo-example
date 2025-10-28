@@ -2,10 +2,11 @@ import type {Todo} from "./Todo.ts";
 
 interface TodoItemProps {
     todo: Todo,
-    handleToggle: (id: number) => void,
-    handleEdit: (todo: Todo) => void
+    handleToggle?: (id: number) => void,
+    handleEdit?: (todo: Todo) => void,
+    handleArchive: (id: number) => void,
 }
-export const TodoItem = ({todo, handleToggle, handleEdit}: TodoItemProps) => {
+export const TodoItem = ({todo, handleToggle, handleEdit, handleArchive}: TodoItemProps) => {
     return (
         <li aria-label={todo.name}
             className={"flex flex-row border-2 border-gray-600 bg-gray-300 m-2 p-2 justify-between"}>
@@ -22,10 +23,11 @@ export const TodoItem = ({todo, handleToggle, handleEdit}: TodoItemProps) => {
 
             </div>
             <div className={"flex flex-row"}>
-                <button className={"align-bottom border-black bg-gray-600 p-2 text-white h-[40px] mr-2"} onClick={() => handleEdit(todo)}>Edit</button>
-                <button
+                <button className={`align-bottom border-black ${todo.status === "archived" ? "bg-green-500" : "bg-red-500"} p-2 text-white h-[40px] mr-2`} onClick={() => handleArchive(todo.id!)}>{todo.status === "archived" ? "Restore" : "Archive"}</button>
+                {handleEdit && <button className={"align-bottom border-black bg-gray-600 p-2 text-white h-[40px] mr-2"} onClick={() => handleEdit(todo)}>Edit</button>}
+                {handleToggle && <button
                     className={"align-bottom border-black bg-gray-600 p-2 text-white h-[40px]"}
-                    onClick={() => handleToggle(todo.id!)}>Mark {todo.status === "complete" ? "Incomplete" : "Complete"}</button>
+                    onClick={() => handleToggle(todo.id!)}>Mark {todo.status === "complete" ? "Incomplete" : "Complete"}</button>}
             </div>
         </li>
     );
